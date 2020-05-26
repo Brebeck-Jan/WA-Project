@@ -1,5 +1,6 @@
 # Install: pip3 install kafka-python
 from kafka import KafkaConsumer
+import groupservice
 
 # The bootstrap server to connect to
 bootstrap = 'my-cluster-kafka-bootstrap:9092'
@@ -12,4 +13,17 @@ consumer = KafkaConsumer('big_data_demo',  # <-- topics
 
 # Print out all received messages
 for msg in consumer:
-    print("Message Received: ", msg)
+    
+    if "g" in msg["reciever_id"]:
+
+        # message goes to a group
+        recievers = get_group_members(msg["reciever_id"], msg["sender_id"])
+
+        for reciever in recievers:
+            
+            # pseudio - later send to server instead
+            print("user:", msg["sender_id"], "send message", msg["message"], "to", reciever)
+    
+    else:
+
+        print("user:", msg["sender_id"], "send message", msg["message"], "to", msg["reciever_id"])
