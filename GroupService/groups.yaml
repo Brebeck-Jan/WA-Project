@@ -1,0 +1,8 @@
+groupid: 6
+groupmembers: [1,3,4]
+---
+groupid: 7
+groupmembers: [1,2,5]
+---
+groupid: 8
+groupmembers: [1,5,3]
