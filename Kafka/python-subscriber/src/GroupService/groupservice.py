@@ -18,24 +18,14 @@ def get_groups():
     
     return groups, keys
 
-def check_id(reciever_id, sender_id):
+def get_group_members(reciever_id, sender_id):
 
     # load groups and keys
     groups, keys = get_groups()
     
-    # check if id belongs to group
-    if reciever_id in keys:
+    # remove sender from group
+    recievers = groups[reciever_id]
+    recievers.remove(sender_id)
 
-        # remove sender from group
-        recievers = groups[reciever_id]
-        recievers.remove(sender_id)
-
-        # return all recievers of message
-        return recievers
-
-    else:
-
-        # reviever is no group
-        return reciever_id
-
-print(check_id(6,3))
+    # return all recievers of message
+    return recievers

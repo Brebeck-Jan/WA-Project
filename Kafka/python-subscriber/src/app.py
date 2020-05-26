@@ -1,7 +1,6 @@
 # Install: pip3 install kafka-python
 from kafka import KafkaConsumer
-import groupservice
-
+from GroupService.groupservice import *
 # The bootstrap server to connect to
 bootstrap = 'my-cluster-kafka-bootstrap:9092'
 
