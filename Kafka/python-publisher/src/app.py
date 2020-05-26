@@ -1,16 +1,10 @@
 import time
-from essential_generators import DocumentGenerator
+
 from kafka import KafkaProducer
 
-gen = DocumentGenerator()
+producer = KafkaProducer(bootstrap_servers="my-cluster-kafka-bootstrap:9092")
 
-producer = KafkaProducer(
-    bootstrap_servers='my-cluster-kafka-bootstrap:9092')
 
-while True:
-    next_msg = gen.sentence()
-    print(f"Sending message: {next_msg}")
-    future = producer.send("big_data_demo", next_msg.encode())
-    result = future.get(timeout=5)
-    print(f"Result: {result}")
-    time.sleep(2)
+def publisher(sender_id, receiver_id, message):
+    next_msg = {"sender_id": sender_id, "receiver_id": receiver_id, "message": message}
+    producer.send("What´s App", next_msg.encode())
