@@ -7,7 +7,7 @@ def get_groups():
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     # load yaml file
-    yamlgroup = yaml.load_all(open(os.path.join(__location__, 'groups.yaml')))
+    yamlgroup = yaml.load_all(open(os.path.join(__location__, 'groups.yaml')), Loader=yaml.FullLoader)
 
     # save to dict
     groups = {}
@@ -37,3 +37,5 @@ def check_id(reciever_id, sender_id):
 
         # reviever is no group
         return reciever_id
+
+print(check_id(6,3))
