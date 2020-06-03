@@ -1,12 +1,30 @@
-import socket
-import pickle
-
-def client(sender_id, receiver_id, message):
-    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    clientsocket.connect(('localhost', 8089))
-    st={'sender_id':str(sender_id), 'message':message, 'receiver_id':str(receiver_id)}
-    serialized_st = pickle.dumps(st)
-    clientsocket.send(serialized_st)
-
-client(98765,56789,'hallo')
-
+# Python program to implement client side of chat room. 
+import socket 
+import select 
+import sys 
+  
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+if len(sys.argv) != 3: 
+    print("Correct usage: script, IP address, port number")
+    exit() 
+IP_address = str(sys.argv[1]) 
+Port = int(sys.argv[2]) 
+server.connect((IP_address, Port)) 
+  
+while True: 
+  
+    # maintains a list of possible input streams 
+    sockets_list = [sys.stdin, server] 
+    read_sockets,write_socket, error_socket = select.select(sockets_list,[],[]) 
+  
+    for socks in read_sockets: 
+        if socks == server: 
+            message = socks.recv(2048) 
+            print(message) 
+        else: 
+            message = sys.stdin.readline() 
+            server.send(message.encode('utf-8')) 
+            sys.stdout.write("<You>") 
+            sys.stdout.write(message) 
+            sys.stdout.flush() 
+server.close() 
