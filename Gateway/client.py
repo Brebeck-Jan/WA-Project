@@ -20,11 +20,11 @@ while True:
     for socks in read_sockets: 
         if socks == server: 
             message = socks.recv(2048) 
-            print(message) 
+            print(message)
         else: 
-            message = sys.stdin.readline() 
-            server.send(message.encode('utf-8')) 
+            message = sys.stdin.readline()
+            server.send(message.encode('utf-8'))
             sys.stdout.write("<You>") 
             sys.stdout.write(message) 
-            sys.stdout.flush() 
-server.close() 
+            sys.stdout.flush()
+server.close()

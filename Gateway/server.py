@@ -32,18 +32,13 @@ def clientthread(conn, addr):
   
     while True: 
             try: 
-                message = conn.recv(2048) 
-                if message: 
-  
-                    print("<" + addr[0] + "> " + message)
-  
-                    # Calls broadcast function to send message to all 
-                    message_to_send = "<" + addr[0] + "> " + message 
-                    broadcast(message_to_send, conn) 
-  
-                else: 
-                    remove(conn) 
-  
+                message = conn.recv(2048)
+
+                # Calls broadcast function to send message to all 
+                message_to_send = "<" + str(addr[1]) + "> " + message.decode("utf-8") 
+                print(message_to_send)
+                broadcast(message_to_send, conn) 
+
             except: 
                 continue
   
@@ -51,12 +46,14 @@ def broadcast(message, connection):
     for clients in list_of_clients: 
         if clients!=connection: 
             try: 
-                clients.send(message) 
+                print("Message to send: "+message)
+                clients.send(message.encode("UTF-8")) 
             except: 
+                print("Exception in broadcast occures")
                 clients.close() 
-  
                 # if the link is broken, we remove the client 
                 remove(clients) 
+  
   
 def remove(connection): 
     if connection in list_of_clients: 
