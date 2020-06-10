@@ -25,8 +25,9 @@ while True:
             if ID == 0:
                 ID = message
         else: 
-            message = sys.stdin.readline()
-            message_to_send = json.dumps({"clienttype":"client","type":"single","receiver":ID.decode("UTF-8"),"message":message.strip()})
+            input_message = sys.stdin.readline()
+            receiver, message = input_message.split(":")
+            message_to_send = json.dumps({"clienttype":"client","receiver":receiver,"message":message[1:]})
             server.send(message_to_send.encode('utf-8'))
             # sys.stdout.write("<You>") 
             # sys.stdout.write(message)

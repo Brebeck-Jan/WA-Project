@@ -3,6 +3,7 @@ import socket
 import select 
 import sys 
 import json
+import time
 from _thread import *
   
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -37,10 +38,13 @@ def clientthread(conn, addr):
                 message = conn.recv(2048)
                 message = message.decode("UTF-8").replace("'", "\"")
                 message = json.loads(message)
+                message["message"] = message["message"].rstrip() 
                 print(message)
                 print(message["receiver"])
 
                 if message["clienttype"] == "client":
+
+
                     # Calls broadcast function to send message to all 
                     message_to_send = "<" + str(addr[1]) + "> " + message["message"]
                     print("message_to_send:"+message_to_send)
@@ -74,7 +78,8 @@ def send_to_one_receiver(message, receiver_id):
         if receiver_id.strip() == str(clients.getpeername()[1]):
             try:
                 print("message to send: (send_to_one)"+message)
-                clients.send(message.encode("UTF-8")) 
+                time.sleep(2)
+                clients.send(message.encode("UTF-8"))
             except: 
                 print("Exception in broadcast occures")
                 clients.close() 
