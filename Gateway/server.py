@@ -2,6 +2,7 @@
 import socket 
 import select 
 import sys 
+import json
 from _thread import *
   
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -28,27 +29,34 @@ list_of_clients = []
 def clientthread(conn, addr): 
   
     # sends a message to the client whose user object is conn 
-    conn.send(b"Welcome to this chatroom!") 
+    # conn.send(b"Welcome to this chatroom!") 
     conn.send(str(addr[1]).encode("UTF-8"))
   
     while True: 
             try: 
                 message = conn.recv(2048)
+                message = message.decode("UTF-8").replace("'", "\"")
+                message = json.loads(message)
+                print(message)
+                print(message["receiver"])
 
-                # Calls broadcast function to send message to all 
-                message_to_send = "<" + str(addr[1]) + "> " + message.decode("utf-8") 
-                print(message_to_send)
-                # broadcast(message_to_send, conn) 
-                test_sender(message.decode("UTF-8"))
+                if message["clienttype"] == "client":
+                    # Calls broadcast function to send message to all 
+                    message_to_send = "<" + str(addr[1]) + "> " + message["message"]
+                    print("message_to_send:"+message_to_send)
+                    # broadcast(message_to_send, conn) 
+                    send_to_one_receiver(message_to_send, message["receiver"])
+
+                elif message["clienttype"] == "server":
+                    pass
+                else:
+                    print("no valid clienttype: "+message[clienttype])
+                
 
             except: 
                 continue
   
 def broadcast(message, connection): 
-    print(list_of_clients[0])
-    print(type(list_of_clients[0]))
-    print(list_of_clients[0].getsockname()[1])
-    print(list_of_clients[0].getpeername()[1])
     for clients in list_of_clients: 
         if clients!=connection: 
             try: 
@@ -60,24 +68,20 @@ def broadcast(message, connection):
                 # if the link is broken, we remove the client 
                 remove(clients) 
   
-def test_sender(message): 
+def send_to_one_receiver(message, receiver_id): 
     print(list_of_clients)
     for clients in list_of_clients: 
-        # print(clients.getpeername()[1])
-        # print(type(clients.getpeername()[1]))
-        # print(str(clients.getpeername()[1]))
-        print(message.strip())
-        print(str(clients.getpeername()[1]))
-        print(message.strip() == str(clients.getpeername()[1]))
-        if message.strip() == str(clients.getpeername()[1]):
-            try: 
-                print("Message to send: "+message)
+        if receiver_id.strip() == str(clients.getpeername()[1]):
+            try:
+                print("message to send: (send_to_one)"+message)
                 clients.send(message.encode("UTF-8")) 
             except: 
                 print("Exception in broadcast occures")
                 clients.close() 
                 # if the link is broken, we remove the client 
                 remove(clients) 
+        else:
+            print("no receiver was found")
   
   
 def remove(connection): 
@@ -85,11 +89,8 @@ def remove(connection):
         list_of_clients.remove(connection) 
   
 while True: 
-  
     conn, addr = server.accept() 
-  
     list_of_clients.append(conn) 
-  
     # prints the address of the user that just connected 
     print(addr[0] + " connected")
   

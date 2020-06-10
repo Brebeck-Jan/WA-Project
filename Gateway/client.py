@@ -2,6 +2,7 @@
 import socket 
 import select 
 import sys 
+import json
   
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 if len(sys.argv) != 3: 
@@ -10,7 +11,7 @@ if len(sys.argv) != 3:
 IP_address = str(sys.argv[1]) 
 Port = int(sys.argv[2]) 
 server.connect((IP_address, Port)) 
-  
+ID = 0
 while True: 
   
     # maintains a list of possible input streams 
@@ -19,12 +20,15 @@ while True:
   
     for socks in read_sockets: 
         if socks == server: 
-            message = socks.recv(2048) 
+            message = socks.recv(2048)
             print(message)
+            if ID == 0:
+                ID = message
         else: 
             message = sys.stdin.readline()
-            server.send(message.encode('utf-8'))
-            sys.stdout.write("<You>") 
-            sys.stdout.write(message) 
+            message_to_send = json.dumps({"clienttype":"client","type":"single","receiver":ID.decode("UTF-8"),"message":message.strip()})
+            server.send(message_to_send.encode('utf-8'))
+            # sys.stdout.write("<You>") 
+            # sys.stdout.write(message)
             sys.stdout.flush()
 server.close()
