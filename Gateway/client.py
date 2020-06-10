@@ -21,9 +21,12 @@ while True:
     for socks in read_sockets: 
         if socks == server: 
             message = socks.recv(2048)
-            print(message)
             if ID == 0:
+                print(message)
                 ID = message
+            else:
+                message = json.loads(message)
+                print(f"Message from {message['sender']}: {message['message']}")
         else: 
             input_message = sys.stdin.readline()
             receiver, message = input_message.split(":")

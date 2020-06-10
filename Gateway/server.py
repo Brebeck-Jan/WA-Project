@@ -5,6 +5,12 @@ import sys
 import json
 import time
 from _thread import *
+
+# import publisher
+import importlib.util
+spec = importlib.util.spec_from_file_location("app.publisher", "../Kafka/python-publisher/src/app.py")
+publisher_app = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(publisher_app)
   
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
@@ -28,11 +34,9 @@ server.listen(100) #change the number if you want more then 100 connections
 list_of_clients = [] 
   
 def clientthread(conn, addr): 
-  
-    # sends a message to the client whose user object is conn 
-    # conn.send(b"Welcome to this chatroom!") 
-    conn.send(str(addr[1]).encode("UTF-8"))
-  
+    id = str(addr[1])
+    #sends the clients his id
+    conn.send(id.encode("UTF-8"))
     while True: 
             try: 
                 message = conn.recv(2048)
@@ -43,24 +47,52 @@ def clientthread(conn, addr):
                 print(message["receiver"])
 
                 if message["clienttype"] == "client":
-
-
-                    # Calls broadcast function to send message to all 
-                    message_to_send = "<" + str(addr[1]) + "> " + message["message"]
-                    print("message_to_send:"+message_to_send)
-                    # broadcast(message_to_send, conn) 
-                    send_to_one_receiver(message_to_send, message["receiver"])
-
+                    print("client")
+                    publisher_app.publisher(sender_id=id,receiver_id=message["receiver"],message=message["message"])
+                    # for testing purpose:
+                    # sender(sender=id,receivers=[id],message=message["message"])
+                    
                 elif message["clienttype"] == "server":
-                    pass
+                    print("server")
+                    sender(sender=message["sender"],receiver=message["receiver"],message=message["message"])
                 else:
                     print("no valid clienttype: "+message[clienttype])
-                
-
             except: 
                 continue
+
+def sender(sender, receivers, message):
+    print("sender")
+    message_to_send = json.dumps({"sender":sender,"message":message})
+    print(message_to_send)
+    print(receivers)
+    for client in list_of_clients: 
+        print(str(client.getpeername()[1]))
+        if client!=sender and str(client.getpeername()[1]) in receivers:
+            try: 
+                print("Message to send: "+message_to_send)
+                client.send(message_to_send.encode("UTF-8")) 
+            except: 
+                print("Exception in broadcast occures")
+                client.close() 
+
+def send_to_one_receiver(message, receiver_id): 
+    # deprecated
+    print(list_of_clients)
+    for clients in list_of_clients: 
+        if receiver_id.strip() == str(clients.getpeername()[1]):
+            try:
+                print("message to send: (send_to_one)"+message)
+                clients.send(message.encode("UTF-8"))
+            except: 
+                print("Exception in broadcast occures")
+                clients.close() 
+                # if the link is broken, we remove the client 
+                remove(clients) 
+        else:
+            print("no receiver was found")
   
 def broadcast(message, connection): 
+    # deprecated
     for clients in list_of_clients: 
         if clients!=connection: 
             try: 
@@ -71,22 +103,6 @@ def broadcast(message, connection):
                 clients.close() 
                 # if the link is broken, we remove the client 
                 remove(clients) 
-  
-def send_to_one_receiver(message, receiver_id): 
-    print(list_of_clients)
-    for clients in list_of_clients: 
-        if receiver_id.strip() == str(clients.getpeername()[1]):
-            try:
-                print("message to send: (send_to_one)"+message)
-                time.sleep(2)
-                clients.send(message.encode("UTF-8"))
-            except: 
-                print("Exception in broadcast occures")
-                clients.close() 
-                # if the link is broken, we remove the client 
-                remove(clients) 
-        else:
-            print("no receiver was found")
   
   
 def remove(connection): 
