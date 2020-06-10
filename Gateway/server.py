@@ -29,6 +29,7 @@ def clientthread(conn, addr):
   
     # sends a message to the client whose user object is conn 
     conn.send(b"Welcome to this chatroom!") 
+    conn.send(str(addr[1]).encode("UTF-8"))
   
     while True: 
             try: 
@@ -37,14 +38,38 @@ def clientthread(conn, addr):
                 # Calls broadcast function to send message to all 
                 message_to_send = "<" + str(addr[1]) + "> " + message.decode("utf-8") 
                 print(message_to_send)
-                broadcast(message_to_send, conn) 
+                # broadcast(message_to_send, conn) 
+                test_sender(message.decode("UTF-8"))
 
             except: 
                 continue
   
 def broadcast(message, connection): 
+    print(list_of_clients[0])
+    print(type(list_of_clients[0]))
+    print(list_of_clients[0].getsockname()[1])
+    print(list_of_clients[0].getpeername()[1])
     for clients in list_of_clients: 
         if clients!=connection: 
+            try: 
+                print("Message to send: "+message)
+                clients.send(message.encode("UTF-8")) 
+            except: 
+                print("Exception in broadcast occures")
+                clients.close() 
+                # if the link is broken, we remove the client 
+                remove(clients) 
+  
+def test_sender(message): 
+    print(list_of_clients)
+    for clients in list_of_clients: 
+        # print(clients.getpeername()[1])
+        # print(type(clients.getpeername()[1]))
+        # print(str(clients.getpeername()[1]))
+        print(message.strip())
+        print(str(clients.getpeername()[1]))
+        print(message.strip() == str(clients.getpeername()[1]))
+        if message.strip() == str(clients.getpeername()[1]):
             try: 
                 print("Message to send: "+message)
                 clients.send(message.encode("UTF-8")) 
