@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata: 
+    name: whatsapp-service
+spec:
+    selector:
+        app: python-gateway
+        app: python-subscriber
+        app: python-publisher
+    clusterIP: 10.96.0.2
+    ports:
+        - protocol: TCP
+          port: 8080
+          targetPort: http

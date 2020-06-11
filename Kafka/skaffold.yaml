@@ -47,3 +47,4 @@ deploy:
       - ./python-publisher/k8s/*
       - ./python-subscriber/k8s/*
       - ./Gateway/k8s/*
+      - ./Gateway/service/*

@@ -17,3 +17,7 @@ spec:
       containers:
         - name: python-publisher
           image: python-kafka-publisher-demo
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP

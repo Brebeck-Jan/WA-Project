@@ -17,3 +17,7 @@ spec:
       containers:
         - name: python-gateway
           image: python-kafka-gateway-demo
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP

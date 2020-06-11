@@ -17,3 +17,7 @@ spec:
       containers:
         - name: python-subscriber
           image: python-kafka-subscriber-demo
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
