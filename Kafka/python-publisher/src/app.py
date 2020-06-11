@@ -1,5 +1,13 @@
 import time
 
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+install("kafka-python")
+
 from kafka import KafkaProducer
 
 producer = KafkaProducer(bootstrap_servers="my-cluster-kafka-bootstrap:9092", api_version=(0,10, 1))

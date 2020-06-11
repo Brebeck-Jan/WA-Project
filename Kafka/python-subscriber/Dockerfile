@@ -6,10 +6,12 @@ RUN adduser -D python
 USER python
 WORKDIR /home/python
 
-CMD ["python", "/home/python/src/app.py"]
-
 COPY --chown=python:python requirements.txt .
 ENV PATH="/home/python/.local/bin:${PATH}"
 RUN pip install --user -r requirements.txt
 
+RUN pip list
+
 COPY --chown=python:python src src
+
+CMD ["python", "./src/app.py"]

@@ -41,6 +41,7 @@ profiles:
               DEBUG: 1
 
 deploy:
+  statusCheckDeadlineSeconds: 600
   kubectl:
     manifests:
       - ./python-publisher/k8s/*
