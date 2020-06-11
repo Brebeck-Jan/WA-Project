@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-gateway
+  template:
+    metadata:
+      labels:
+        app: python-gateway
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+        - name: python-gateway
+          image: python-kafka-gateway-demo
